@@ -80,30 +80,7 @@ public class ImportData
                     if (!brickContext.Any(b => b.PartNum == part!["part"]!["part_num"]!.ToString()
                                                && b.ColorId == part!["color"]!["id"]!.ToString()))
                     {
-                        var partNum = part!["part"]!["part_num"]!.ToString();
-                        var name = part!["part"]!["name"]!.ToString();
-                        var partUrl = part!["part"]!["part_url"]!.ToString();
-                        var partImg = part!["part"]!["part_img_url"]!.ToString();
-                        var colorId = part!["color"]!["id"]!.ToString();
-                        var colorName = part!["color"]!["name"]!.ToString();
-                        var rgb = part!["color"]!["rgb"]!.ToString();
-                        var isTrans = part!["color"]!["is_trans"]!.ToString().Equals("true");
-                        var count = 0;
-
-                        brick = new Brick
-                        {
-                            PartNum = partNum,
-                            Name = name,
-                            PartURL = partUrl,
-                            PartImg = partImg,
-                            ColorId = colorId,
-                            ColorName = colorName,
-                            RGB = rgb,
-                            IsTrans = isTrans,
-                            Count = count
-                        };
-
-                        brickContext.Add(brick);
+                        brick = ImportBrick(part);
                     }
                     else
                     {
@@ -111,49 +88,54 @@ public class ImportData
                                                         && b.ColorId == part["color"]!["id"]!.ToString());
                     }
 
+                    if (brick == null)
+                    {
+                        throw new Exception($"No brick found with ID {part!["part"]!["part_num"]}");
+                    }
 
-                    var PartNum = brick!.PartNum;
-                    var ColorId = brick!.ColorId;
-                    var SetId = set.SetId;
-                    var Count = 0;
-                    var SpareCount = 0;
+
+                    var partNum = brick!.PartNum;
+                    var colorId = brick!.ColorId;
+                    var localSetId = set.SetId;
+                    var count = 0;
+                    var spareCount = 0;
 
                     var isSpare = part!["is_spare"]!.ToString().Equals("true");
 
                     if (isSpare)
                     {
-                        SpareCount = int.Parse(part!["quantity"].ToString());
+                        spareCount = int.Parse(part!["quantity"].ToString());
                     }
                     else
                     {
-                        Count = int.Parse(part!["quantity"].ToString());
+                        count = int.Parse(part!["quantity"].ToString());
                     }
 
-                    if (!setBrickContext.Any(sb => sb.PartNum == PartNum
-                                                   && sb.ColorId == ColorId
-                                                   && sb.SetId == SetId))
+                    if (!setBrickContext.Any(sb => sb.PartNum == partNum
+                                                   && sb.ColorId == colorId
+                                                   && sb.SetId == localSetId))
                     {
                         SetBrick setBrick = new SetBrick
                         {
-                            PartNum = PartNum,
-                            ColorId = ColorId,
-                            SetId = SetId,
-                            Count = Count,
-                            SpareCount = SpareCount,
+                            PartNum = partNum,
+                            ColorId = colorId,
+                            SetId = localSetId,
+                            Count = count,
+                            SpareCount = spareCount,
                         };
                         
                         setBrickContext.Add(setBrick);
                     }
                     else
                     {
-                        SetBrick setBrick = setBrickContext.First(sb => sb.PartNum == PartNum
-                                                               && sb.ColorId == ColorId
-                                                               && sb.SetId == SetId);
+                        SetBrick setBrick = setBrickContext.First(sb => sb.PartNum == partNum
+                                                               && sb.ColorId == colorId
+                                                               && sb.SetId == localSetId);
                         
                         if(isSpare)
-                            setBrick.SpareCount = SpareCount;
+                            setBrick.SpareCount = spareCount;
                         else
-                            setBrick.Count = Count;
+                            setBrick.Count = count;
                     }
 
 
@@ -171,43 +153,50 @@ public class ImportData
         return false;
     }
 
-    // public bool ImportBrick(Brick brick, string colorId)
-    // {
-    //     RebrickableApi api = new RebrickableApi();
-    //     
-    //     
-    //     JsonObject? bricks = api.GetPartInfo(brick.PartNum).Result;
-    //
-    //     using (var context = new InventoryContext())
-    //     {
-    //         var brickContext = context.Set<Brick>();
-    //
-    //
-    //         if (!brickContext.Any(b => b.PartNum == brick.PartNum
-    //                                    && b.ColorId == colorId)
-    //         {
-    //             brick = new Brick
-    //             {
-    //                 PartNum = part!["id"]!.ToString(),
-    //                 Name = part!["name"]!.ToString(),
-    //                 PartURL = part!["part_url"]!.ToString(),
-    //                 PartImg = part!["part_img_url"]!.ToString(),
-    //                 ColorId = part!["color"]!["id"]!.ToString(),
-    //                 ColorName = part!["color"]!["name"]!.ToString(),
-    //                 RGB = part!["color"]!["RGB"]!.ToString(),
-    //                 IsTrans = part!["color"]!["is_trans"]!.ToString().Equals("true"),
-    //                 Count = 0
-    //             };
-    //
-    //             brickContext.Add(brick);
-    //         }
-    //         else
-    //         {
-    //             brick = brickContext.First(b => b.PartNum == part!["id"]!.ToString()
-    //                                             && b.ColorId == part["color"]!["id"]!.ToString());
-    //         }
-    //     }
-    //
-    //     return false;
-    // }
+    public Brick ImportBrick(JsonNode part)
+    {
+        RebrickableApi api = new RebrickableApi();
+        
+        using (var context = new InventoryContext())
+        {
+            var brickContext = context.Set<Brick>();
+    
+    
+            Brick brick;
+
+            if (!brickContext.Any(b => b.PartNum == part!["part"]!["part_num"]!.ToString()
+                                       && b.ColorId == part!["color"]!["id"]!.ToString()))
+            {
+                var partNum = part!["part"]!["part_num"]!.ToString();
+                var name = part!["part"]!["name"]!.ToString();
+                var partUrl = part!["part"]!["part_url"]!.ToString();
+                var partImg = part!["part"]!["part_img_url"]!.ToString();
+                var colorId = part!["color"]!["id"]!.ToString();
+                var colorName = part!["color"]!["name"]!.ToString();
+                var rgb = part!["color"]!["rgb"]!.ToString();
+                var isTrans = part!["color"]!["is_trans"]!.ToString().Equals("true");
+                var count = 0;
+
+                brick = new Brick
+                {
+                    PartNum = partNum,
+                    Name = name,
+                    PartURL = partUrl,
+                    PartImg = partImg,
+                    ColorId = colorId,
+                    ColorName = colorName,
+                    RGB = rgb,
+                    IsTrans = isTrans,
+                    Count = count
+                };
+
+                brickContext.Add(brick);
+                context.SaveChanges();
+
+                return brick;
+            }
+        }
+    
+        return null;
+    }
 }
