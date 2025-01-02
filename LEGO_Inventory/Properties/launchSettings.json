@@ -7,7 +7,8 @@
         "launchBrowser": true,
         "applicationUrl": "http://localhost:5173",
         "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "LEGO_API_KEY": "2bdf36228441b1f3d27af6432e7f97ad"
         }
       },
       "https": {
@@ -16,7 +17,8 @@
         "launchBrowser": true,
         "applicationUrl": "https://localhost:7117;http://localhost:5173",
         "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "LEGO_API_KEY": "2bdf36228441b1f3d27af6432e7f97ad"
         }
       }
     }

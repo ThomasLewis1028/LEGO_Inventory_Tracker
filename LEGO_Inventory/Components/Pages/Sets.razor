@@ -1,0 +1,39 @@
+﻿@page "/sets"
+@rendermode InteractiveServer
+
+<PageTitle>Sets</PageTitle>
+
+<h1>Sets</h1>
+
+
+<form method="post" @onsubmit="ImportSet" @formname="setimport">
+    <AntiforgeryToken/>
+    <div>
+        <label>
+            <InputText @bind-Value="setId"/>
+        </label>
+    </div>
+    <div>
+        <button type="submit">Import</button>
+    </div>
+</form>
+
+@code {
+    private string setId;
+
+    private void ImportSet()
+    {
+        ImportData importData = new ImportData();
+
+        if (!importData.ImportSetInfo(setId))
+        {
+            throw new Exception("No set found");
+        }
+
+        if (!importData.ImportSetParts(setId))
+        {
+            throw new Exception("No set found");
+        }
+    }
+
+}
