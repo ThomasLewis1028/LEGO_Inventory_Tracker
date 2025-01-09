@@ -23,36 +23,22 @@
 @code {
     private string? _setId;
     JsonObject? _set;
-    private const string BaseUrl = "https://rebrickable.com/api/v3/lego/";
 
     private async Task ImportSet()
     {
-        var client = ClientFactory.CreateClient();
-        
-        try
-        {
-            RebrickableApi rebrickableApi = new RebrickableApi();
-        
-            _set = await rebrickableApi.GetSetInfo(client, _setId);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            
-            throw;
-        }
-                
-        // ImportData importData = new ImportData();
-        
-        // if (!importData.ImportSetInfo(client, setId))
-        // {
-        //     throw new Exception("No set found");
-        // }
+        ImportData importData = new ImportData();
 
-        // if (!importData.ImportSetParts(setId))
-        // {
-        //     throw new Exception("No set found");
-        // }
+        var temp = importData.ImportSetInfo(_setId);
+
+        if (!temp)
+        {
+            throw new Exception("No set found");
+        }
+
+        if (!importData.ImportSetParts(_setId))
+        {
+            throw new Exception("No set found");
+        }
     }
 
 }

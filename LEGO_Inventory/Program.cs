@@ -18,6 +18,7 @@ builder.Services.AddScoped(sp =>
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         builder2 => builder2
+            .AllowCredentials()
             .AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader()));

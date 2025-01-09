@@ -8,40 +8,42 @@ public class RebrickableApi
     private const string BaseUrl = "https://rebrickable.com/api/v3/lego/";
     
     
-    public async Task<JsonObject?> GetSetInfo(HttpClient client, string? setId)
+    public async Task<JsonObject?> GetSetInfo(string? setId)
     {
         string url = $"{BaseUrl}sets/{setId}/?page_size=1000000&";
 
-        return await SendQuery(client, url);
+        return await SendQuery(url);
     }
     
     
-    public async Task<JsonObject?> GetSetParts(HttpClient client, string setId)
+    public async Task<JsonObject?> GetSetParts(string setId)
     {
         string url = $"{BaseUrl}sets/{setId}/parts/?page_size=1000000&inc_minifig_parts=1&";
 
-        return await SendQuery(client, url);
+        return await SendQuery(url);
     }
     
     
-    public async Task<JsonObject?> GetPartInfo(HttpClient client, string partNum)
+    public async Task<JsonObject?> GetPartInfo(string partNum)
     {
         string url = $"{BaseUrl}parts/{partNum}/?";
 
-        return await SendQuery(client, url);
+        return await SendQuery(url);
     }
 
-    private async Task<JsonObject?> SendQuery(HttpClient client, string url)
+    private async Task<JsonObject?> SendQuery(string url)
     {
         try
         {
+            HttpClient client = new HttpClient();
+            
             string? apiKey = Environment.GetEnvironmentVariable("LEGO_API_KEY");
                 
             HttpResponseMessage response;
             Console.WriteLine($"{DateTime.Now} Requesting...");
             Uri uri = new Uri($"{url}key={apiKey}");
-            response = await client.GetAsync(uri);
-            Console.WriteLine($"{DateTime.Now} Response: {response}");
+            response = client.GetAsync(uri).Result;
+            Console.WriteLine($"{DateTime.Now} Response: {response.StatusCode}");
                 
 
             if (response.IsSuccessStatusCode)

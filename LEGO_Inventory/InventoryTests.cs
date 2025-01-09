@@ -15,9 +15,8 @@ public class InventoryTests
         public void GetSetPartsTest()
         {
             RebrickableApi api = new RebrickableApi();
-            var client = new HttpClient();
 
-            var response = api.GetSetParts(client, "4502-1");
+            var response = api.GetSetParts("4502-1");
         
             Assert.IsNotNull(response.Result);
         }
@@ -26,9 +25,8 @@ public class InventoryTests
         public void GetSetInfoTest()
         {
             RebrickableApi api = new RebrickableApi();
-            var client = new HttpClient();
 
-            var response = api.GetSetInfo(client, "4502-1");
+            var response = api.GetSetInfo("4502-1");
 
             Assert.IsNotNull(response.Result);
         }
@@ -37,9 +35,8 @@ public class InventoryTests
         public void GetSetPartInfoTest()
         {
             RebrickableApi api = new RebrickableApi();
-            var client = new HttpClient();
 
-            var response = api.GetPartInfo(client, "3001");
+            var response = api.GetPartInfo("3001");
         
             Assert.IsNotNull(response.Result);
             
@@ -54,9 +51,8 @@ public class InventoryTests
         public void ImportSetInfoTest()
         {
             var ImportData = new ImportData();
-            var client = new HttpClient();
             
-            Assert.IsTrue(ImportData.ImportSetInfo(client, "4502-1"));
+            Assert.IsTrue(ImportData.ImportSetInfo("4502-2"));
 
             var context = new InventoryContext();
             var setBrickContext = context.Set<SetBrick>();
@@ -73,11 +69,10 @@ public class InventoryTests
         [TestMethod]
         public void ImportSetPartTest()
         {
-            var ImportData = new ImportData();
-            var client = new HttpClient();
+            var importData = new ImportData();
             
-            Assert.IsTrue(ImportData.ImportSetInfo(client, "4502-1"));
-            Assert.IsTrue(ImportData.ImportSetParts(client, "4502-1"));
+            Assert.IsTrue(importData.ImportSetInfo("4502-1"));
+            Assert.IsTrue(importData.ImportSetParts("4502-1"));
             
             var context = new InventoryContext();
             var setBrickContext = context.Set<SetBrick>();
