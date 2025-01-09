@@ -5,11 +5,11 @@ namespace LEGO_Inventory;
 
 public class ImportData
 {
-    public bool ImportSetInfo(string setId)
+    public bool ImportSetInfo(HttpClient client, string? setId)
     {
         RebrickableApi api = new RebrickableApi();
 
-        JsonObject? setInfo = api.GetSetInfo(setId).Result;
+        JsonObject? setInfo = api.GetSetInfo(client, setId).Result;
 
         using (var context = new InventoryContext())
         {
@@ -55,11 +55,11 @@ public class ImportData
         return false;
     }
 
-    public bool ImportSetParts(string setId)
+    public bool ImportSetParts(HttpClient client, string setId)
     {
         RebrickableApi api = new RebrickableApi();
 
-        JsonObject? setParts = api.GetSetParts(setId).Result;
+        JsonObject? setParts = api.GetSetParts(client, setId).Result;
         int saveCount = 0;
 
         using (var context = new InventoryContext())
@@ -160,7 +160,6 @@ public class ImportData
         using (var context = new InventoryContext())
         {
             var brickContext = context.Set<Brick>();
-    
     
             Brick brick;
 

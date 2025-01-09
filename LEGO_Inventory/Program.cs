@@ -7,13 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped(sp =>
     new HttpClient
     {
         BaseAddress = new Uri("https://rebrickable.com/")
     });
-
-builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",

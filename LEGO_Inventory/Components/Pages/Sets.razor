@@ -1,5 +1,7 @@
 ﻿@page "/sets"
+@using System.Text.Json.Nodes
 @rendermode InteractiveServer
+@inject IHttpClientFactory ClientFactory
 
 <PageTitle>Sets</PageTitle>
 
@@ -10,7 +12,7 @@
     <AntiforgeryToken/>
     <div>
         <label>
-            <InputText @bind-Value="setId"/>
+            <InputText @bind-Value="_setId"/>
         </label>
     </div>
     <div>
@@ -19,16 +21,33 @@
 </form>
 
 @code {
-    private string setId;
+    private string? _setId;
+    JsonObject? _set;
+    private const string BaseUrl = "https://rebrickable.com/api/v3/lego/";
 
-    private void ImportSet()
+    private async Task ImportSet()
     {
-        ImportData importData = new ImportData();
-
-        if (!importData.ImportSetInfo(setId))
+        var client = ClientFactory.CreateClient();
+        
+        try
         {
-            throw new Exception("No set found");
+            RebrickableApi rebrickableApi = new RebrickableApi();
+        
+            _set = await rebrickableApi.GetSetInfo(client, _setId);
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            
+            throw;
+        }
+                
+        // ImportData importData = new ImportData();
+        
+        // if (!importData.ImportSetInfo(client, setId))
+        // {
+        //     throw new Exception("No set found");
+        // }
 
         // if (!importData.ImportSetParts(setId))
         // {
