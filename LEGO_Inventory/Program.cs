@@ -1,3 +1,4 @@
+using LEGO_Inventory;
 using LEGO_Inventory.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +7,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddScoped(sp =>
+    new HttpClient
+    {
+        BaseAddress = new Uri("https://rebrickable.com/")
+    });
+
 builder.Services.AddHttpClient();
+
+builder.Services.AddCors(options =>
+    options.AddPolicy("AllowAll",
+        builder2 => builder2
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()));
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 

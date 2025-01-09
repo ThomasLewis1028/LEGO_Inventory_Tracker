@@ -40,7 +40,9 @@ public class RebrickableApi
             string? apiKey = Environment.GetEnvironmentVariable("LEGO_API_KEY");
                 
             HttpResponseMessage response;
+            Console.WriteLine($"{DateTime.Now} Requesting...");
             response = await client.GetAsync(new Uri($"{url}key={apiKey}"));
+            Console.WriteLine($"{DateTime.Now} Response: {response}");
                 
 
             if (response.IsSuccessStatusCode)
