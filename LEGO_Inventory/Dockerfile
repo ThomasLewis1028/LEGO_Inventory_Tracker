@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
@@ -20,4 +20,10 @@ RUN dotnet publish "LEGO_Inventory.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "LEGO_Inventory.dll"]
+COPY entrypoint.sh /usr/bin/
+RUN dotnet tool install -g dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+ENTRYPOINT ["entrypoint.sh"]
+
+CMD ["dotnet", "LEGO_Inventory.dll"]
