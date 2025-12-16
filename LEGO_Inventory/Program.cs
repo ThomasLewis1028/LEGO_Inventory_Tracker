@@ -1,5 +1,7 @@
 using LEGO_Inventory.Components;
 using LEGO_Inventory.Database;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 
@@ -29,37 +31,23 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowAnyHeader()));
 
-builder.Services.AddControllers();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
+        options.SlidingExpiration = true;
+    });
 
-// builder.Services.AddAuthentication(options =>
-//     {
-//         options.DefaultScheme =
-//             Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme;
-//         options.DefaultChallengeScheme = "GitHub";
-//     })
-//     .AddCookie()
-//     .AddMicrosoftAccount(options =>
-//     {
-//         options.ClientId = builder.Configuration["Authentication:MicrosoftAccount:ClientId"];
-//         options.ClientSecret = builder.Configuration["Authentication:MicrosoftAccount:ClientSecret"];
-//     })
-//     .AddGitHub(options =>
-//     {
-//         options.ClientId = builder.Configuration["Authentication:GitHub:ClientId"];
-//         options.ClientSecret = builder.Configuration["Authentication:GitHub:ClientSecret"];
-//     })
-//     .AddGoogle(options =>
-//     {
-//         options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-//         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-//     })
-//     .AddDiscord(options =>
-//     {
-//         options.ClientId = builder.Configuration["Authentication:Discord:ClientId"];
-//         options.ClientSecret = builder.Configuration["Authentication:Discord:ClientSecret"];
-//     });
+builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -68,7 +56,6 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 
 await using var scope = app.Services.CreateAsyncScope();
 await using var db = scope.ServiceProvider.GetService<InventoryContext>();

@@ -10,5 +10,5 @@ public class User
     
     public Guid Salt { get; set; }
     
-    public int SaltIndex { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
